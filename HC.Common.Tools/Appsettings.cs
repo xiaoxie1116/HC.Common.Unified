@@ -36,7 +36,7 @@ namespace HC.Common.Tools
         /// </summary>
         /// <param name="sections"></param>
         /// <returns></returns>
-        public static string app(params string[] sections)
+        public static string GetSettingNode(params string[] sections)
         {
             try
             {

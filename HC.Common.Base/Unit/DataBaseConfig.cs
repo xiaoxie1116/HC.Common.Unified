@@ -2,6 +2,7 @@
 using SqlSugar;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace HC.Common.Base.Unit
@@ -12,7 +13,7 @@ namespace HC.Common.Base.Unit
     public class DataBaseConfig
     {
         private static string _connectionWriteStr;
-        private static string[] _connectionReadStr;
+        private static List<string> _connectionReadStr = new List<string>();
         private SqlSugarClient _db;
 
         /// <summary>
@@ -28,17 +29,17 @@ namespace HC.Common.Base.Unit
             {
                 if (connStr.Contains('|'))
                 {
-                    _connectionReadStr = connStr.Split('|');
+                    _connectionReadStr.AddRange(connStr.Split('|'));
                 }
                 else
-                    _connectionReadStr[0] = connStr;
+                    _connectionReadStr.Add(connStr);
             }
 
             if (string.IsNullOrEmpty(_connectionWriteStr))
                 throw new ArgumentNullException("数据库连接字符串为空");
 
             List<SlaveConnectionConfig> connectionConfigs = null;
-            if (_connectionReadStr.Length > 0)
+            if (_connectionReadStr != null && _connectionReadStr.Any())
             {
                 connectionConfigs = new List<SlaveConnectionConfig>();
                 foreach (var item in _connectionReadStr)
@@ -83,7 +84,6 @@ namespace HC.Common.Base.Unit
         }
 
 
-
         /// <summary>
         /// 数据连接对象       
         /// </summary>
@@ -93,19 +93,5 @@ namespace HC.Common.Base.Unit
             private set { _db = value; }
         }
 
-
-        /// <summary>
-        /// 加密随机数生成器 生成随机种子
-        /// 该算法解决当计算机运算速度足够快的时候，系统来不及计算下一个随机数，最终可能产生一长串相同的数值问题
-        /// </summary>
-        /// <returns></returns>
-        static int GetRandomSeed()
-        {
-            byte[] bytes = new byte[4];
-            System.Security.Cryptography.RNGCryptoServiceProvider r = new System.Security.Cryptography.RNGCryptoServiceProvider();
-            r.GetBytes(bytes);
-            return BitConverter.ToInt32(bytes, 0);
-
-        }
     }
 }
