@@ -28,7 +28,7 @@ namespace HC.Common.Tools
                 //      因进入与退出写入模式应在同一个try finally语句块内，所以在请求进入写入模式之前不能触发异常，否则释放次数大于请求次数将会触发异常
                 LogWriteLock.EnterWriteLock();
 
-                var path = Path.Combine(_contentRoot, "Log");
+                var path = Path.Combine(_contentRoot, "Logs");
                 if (!Directory.Exists(path))
                 {
                     Directory.CreateDirectory(path);
@@ -95,7 +95,7 @@ namespace HC.Common.Tools
 
             try
             {
-                var aoplogContent = ReadLogger(Path.Combine(_contentRoot, "Log", "AOPLog.log"), Encoding.UTF8);
+                var aoplogContent = ReadLogger(Path.Combine(_contentRoot, "Logs", "AOPLog.log"), Encoding.UTF8);
 
                 if (!string.IsNullOrEmpty(aoplogContent))
                 {
@@ -113,7 +113,7 @@ namespace HC.Common.Tools
 
             try
             {
-                var exclogContent = ReadLogger(Path.Combine(_contentRoot, "Log", $"GlobalExcepLogs_{DateTime.Now.ToString("yyyMMdd")}.log"), Encoding.UTF8);
+                var exclogContent = ReadLogger(Path.Combine(_contentRoot, "Logs", $"ExcepLogs_{DateTime.Now.ToString("yyyMMdd")}.log"), Encoding.UTF8);
 
                 if (!string.IsNullOrEmpty(exclogContent))
                 {
@@ -133,7 +133,7 @@ namespace HC.Common.Tools
 
             try
             {
-                var sqllogContent = ReadLogger(Path.Combine(_contentRoot, "Log", "SqlLog.log"), Encoding.UTF8);
+                var sqllogContent = ReadLogger(Path.Combine(_contentRoot, "Logs", "SqlLog.log"), Encoding.UTF8);
 
                 if (!string.IsNullOrEmpty(sqllogContent))
                 {

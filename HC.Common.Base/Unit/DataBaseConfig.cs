@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace HC.Common.Base.Unit
 {
@@ -51,6 +52,10 @@ namespace HC.Common.Base.Unit
                     });
                 }
             }
+
+            bool reval = false;
+            var isSqlAop = Appsettings.GetSettingNode(new string[] { "AppSettings", "SqlAOP", "Enabled" });
+            reval = !string.IsNullOrEmpty(isSqlAop) ? bool.Parse(isSqlAop) : false;
             //数据库读写分离（自动将写的操作连接到主库，读的操作连接到次库）
             _db = new SqlSugarClient(new ConnectionConfig()
             {
@@ -67,6 +72,20 @@ namespace HC.Common.Base.Unit
                 MoreSettings = new ConnMoreSettings()
                 {
                     IsAutoRemoveDataCache = false  //为true表示可以自动删除二级缓存
+                },
+                AopEvents = new AopEvents
+                {
+                    OnLogExecuting = (sql, p) =>
+                    {
+                        if (reval)
+                        {
+                            Parallel.For(0, 1, e =>
+                            {
+                                //MiniProfiler.Current.CustomTiming("SQL：", GetParas(p) + "【SQL语句】：" + sql);
+                                LoggerLock.OutPutLogger("SqlLog", new string[] { GetParas(p), "【SQL语句】：" + sql });
+                            });
+                        }
+                    }
                 }
             });
 
@@ -91,6 +110,16 @@ namespace HC.Common.Base.Unit
         {
             get { return _db; }
             private set { _db = value; }
+        }
+
+        private static string GetParas(SugarParameter[] pars)
+        {
+            string key = "【SQL参数】：";
+            foreach (var param in pars)
+            {
+                key += $"{param.ParameterName}:{param.Value}\n";
+            }
+            return key;
         }
 
     }
